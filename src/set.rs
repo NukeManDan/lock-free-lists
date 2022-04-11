@@ -1,9 +1,7 @@
 use std::{sync::{atomic::Ordering, Arc}, ops::Deref};
 
 use crossbeam_epoch::{Atomic, Shared, pin, Guard, Owned};
-use crate::search
-
-//pub mod search;
+use crate::{Searchable, search};
 
 
 #[derive(Debug)]
@@ -68,7 +66,9 @@ impl<K:Ord+Clone> SetList<K> {
 
 
 impl<K> Searchable<K> for Node<K> {
-    fn get_key(&self) -> &K {self.key.as_ref().expect("Non-sentinal nodes always have `Some` key."); }
+    fn get_key(&self) -> &K {
+        self.key.as_ref().expect("Non-sentinal nodes always have `Some` key.")
+    }
 }
 
 fn remove<'g,K:Ord>(head:NodeAtm<'g,K>,tail:NodeAtm<'g,K>,key:&K,g:&'g Guard)->bool{

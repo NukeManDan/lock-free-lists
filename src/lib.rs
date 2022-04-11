@@ -2,14 +2,21 @@
 pub mod map;
 pub mod set;
 
+use crossbeam_epoch::{Atomic, Shared, Guard, Owned};
+
 
 pub(crate) type NodeAtm<'g,N> = &'g Atomic<N>;
 pub(crate) type LoadedNode<'g,N> = (&'g Atomic<N>,Shared<'g,N>);
 
 // N is any type for your nodes, we want a struct for maps and prim. for sets
-// K is the key for seraching and add/reomve items in the ordered list of nodes.
+// K is the key for searching and add/remove items in the ordered list of nodes.
 pub(crate) trait Searchable<K> {
 	fn get_key(&self) -> &K;
+}
+
+/// T is any concrete type
+pub(crate) trait HasNext<T>{
+    fn next(&mut self) -> Option<T>;
 }
 
 pub(crate) fn search<'g,K:Ord,N:Searchable<K>>(head:LoadedNode<'g,N>,tail:LoadedNode<'g,N>,search_key:&K,g:&'g Guard)->(LoadedNode<'g,K>,LoadedNode<'g,K>){
